@@ -6,7 +6,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
-import imageRoutes from './routes/imageRoutes.js';
+import jobRoutes from './routes/jobRoutes.js'; // Replaces imageRoutes.js
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,13 +20,18 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Serve uploaded files statically
+// Serve uploaded/generated files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 3. API Routes
-app.use('/api/images', imageRoutes);
+// Health endpoint for Milestone 1 requirements
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy', timestamp: new Date() });
+});
 
-// 4. Centralized Error Handler
+// 3. Modular Core Job Routes
+app.use('/api/v1/jobs', jobRoutes);
+
+// 4. Centralized Error Handler (Preserved from your code)
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
