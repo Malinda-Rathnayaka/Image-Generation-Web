@@ -82,3 +82,39 @@ export const getJobStatus = async (req, res, next) => {
     next(err); // Delegates to centralized error handler in server.js
   }
 };
+
+// GET /api/v1/jobs/site-info
+export const getSiteInfo = async (req, res, next) => {
+  try {
+    return res.status(200).json({
+      success: true,
+      site: {
+        id: req.site._id,
+        name: req.site.name,
+        spentUsd: req.site.spentUsd || 0,
+        limits: req.site.limits || { monthlyBudgetUsd: 10.0, rateLimitRpm: 30 },
+        features: req.site.features || {},
+        theme: req.site.theme || null
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// GET /api/v1/jobs/history
+export const getJobHistory = async (req, res, next) => {
+  try {
+    const jobs = await Job.find({ siteId: req.site._id })
+      .sort({ createdAt: -1 })
+      .limit(30)
+      .select('jobId prompt status imagePath simulatedCost createdAt options errorMessage');
+
+    return res.status(200).json({
+      success: true,
+      jobs
+    });
+  } catch (err) {
+    next(err);
+  }
+};

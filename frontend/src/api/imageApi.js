@@ -1,19 +1,17 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+import { submitJob, pollJobUntilDone } from './jobApi';
 
-export const generateImage = async (prompt) => {
-  const response = await fetch(`${BASE_URL}/generate-image`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ prompt }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error || 'Failed to generate image');
+export const generateImage = async (prompt, options = {}, apiKey = 'tshirt', userId = 'user_demo') => {
+  const job = await submitJob(prompt, options, apiKey, userId);
+  const result = await pollJobUntilDone(job.jobId, apiKey, userId);
+  if (result.status === 'failed') {
+    throw new Error(result.errorMessage || 'Image generation failed');
   }
-
-  return data.data; // Returns MongoDB object: { _id, prompt, imagePath, createdAt }
+  return {
+    _id: result.jobId,
+    prompt,
+    imagePath: result.imagePath,
+    simulatedCost: result.simulatedCost,
+    status: result.status,
+    createdAt: new Date().toISOString()
+  };
 };
