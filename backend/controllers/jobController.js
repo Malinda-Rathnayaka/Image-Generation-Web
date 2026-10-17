@@ -53,6 +53,7 @@ async function processJobInBackground(jobId, site) {
       site.spentUsd = (site.spentUsd || 0) + (result.simulatedCost || 0);
       await site.save();
     } catch (err) {
+      console.error(`[Background Worker Error] Job ${jobId} failed:`, err.message);
       job.status = 'failed';
       job.errorMessage = err.message || 'Image generation failed.';
       await job.save();

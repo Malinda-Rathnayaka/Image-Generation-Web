@@ -12,6 +12,15 @@ import {
   ExternalLink,
   X
 } from 'lucide-react';
+import { BASE_URL } from '../api/axiosClient';
+
+const getImageUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  return `${BASE_URL}${path}`;
+};
 
 export default function CanvasViewport({ 
   currentJob, 
@@ -100,7 +109,7 @@ export default function CanvasViewport({
         <div className="active-image-container">
           <div className="image-frame">
             <img 
-              src={activeImage.imagePath} 
+              src={getImageUrl(activeImage.imagePath)} 
               alt={activeImage.prompt || 'Generated art'} 
               onClick={() => setLightboxOpen(true)}
               style={{ cursor: 'zoom-in' }}
@@ -169,7 +178,7 @@ export default function CanvasViewport({
                 </button>
               </div>
               <img 
-                src={activeImage.imagePath} 
+                src={getImageUrl(activeImage.imagePath)} 
                 alt={activeImage.prompt} 
                 style={{ width: '100%', borderRadius: 'var(--radius-md)', maxHeight: '75vh', objectFit: 'contain' }} 
               />

@@ -1,5 +1,14 @@
 import React from 'react';
 import { History, Image as ImageIcon, ExternalLink, RefreshCw } from 'lucide-react';
+import { BASE_URL } from '../api/axiosClient';
+
+const getImageUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  return `${BASE_URL}${path}`;
+};
 
 export default function JobHistory({ jobs, onSelectJob, onRefreshHistory, loadingHistory }) {
   if (!jobs || jobs.length === 0) {
@@ -48,7 +57,7 @@ export default function JobHistory({ jobs, onSelectJob, onRefreshHistory, loadin
             >
               <div className="history-thumb-wrapper">
                 {isCompleted && job.imagePath ? (
-                  <img src={job.imagePath} alt={job.prompt} loading="lazy" />
+                  <img src={getImageUrl(job.imagePath)} alt={job.prompt} loading="lazy" />
                 ) : (
                   <div style={{ 
                     height: '100%', 
